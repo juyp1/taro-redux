@@ -1,8 +1,8 @@
 import React, { Component } from "react";
 import { connect } from "react-redux";
 import { View, Button, Text } from "@tarojs/components";
-import { getTopicslist } from "../../../actions/home";
-import { AtList, AtListItem } from "taro-ui";
+import { getTopicslist,getTopicslistPage } from "../../../actions/home";
+import { AtList, AtListItem,AtLoadMore } from "taro-ui";
 
 @connect(
   function (store) {
@@ -13,17 +13,34 @@ import { AtList, AtListItem } from "taro-ui";
       homelist(params) {
         dispatch(getTopicslist(params));
       },
+      loadlist(params){
+        dispatch(getTopicslistPage(params))
+      }
     };
-  }
+  },
 )
 class Index extends Component {
+  state={
+    status:"more"
+  }
   handlechange() {
+      this.initList()
+  }
+  componentWillMount() {
+    this.initList()
+  }
+  initList(){
+    this.props.params.page=1
     this.props.params.tab = this.props.menutype;
     this.props.homelist && this.props.homelist(this.props.params);
   }
-  componentWillMount() {
-    this.props.params.tab = this.props.tab;
-    this.props.homelist && this.props.homelist(this.props.params);
+  // 继续加载页面
+  handleloadmore(){
+ 
+    // this.props.params.tab = this.props.tab;
+    
+     
+     this.props.loadlist && this.props.loadlist(this.props.params);
   }
   componentDidMount() {
     this.props.onRef(this);
@@ -45,6 +62,10 @@ class Index extends Component {
             );
           })}
         </AtList>
+        <AtLoadMore
+          onClick={this.handleloadmore.bind(this)}
+          status={this.state.status}
+        />
       </View>
     );
   }
